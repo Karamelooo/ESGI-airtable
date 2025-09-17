@@ -82,10 +82,10 @@ curl http://localhost:3000/api/records
 
 ## Membres du groupe
 
-- À compléter : <Nom 1>
-- À compléter : <Nom 2>
-- À compléter : <Nom 3>
+- Petit Hugo : *Développeur*
 - Poumailloux Léo : *Développeur*
+- Serenne Arthur : *Développeur*
+- Yildiz Erkant : *Développeur*
 
 ## Informations utiles supplémentaires
 
