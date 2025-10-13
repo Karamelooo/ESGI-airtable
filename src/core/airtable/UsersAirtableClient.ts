@@ -5,7 +5,6 @@ export type UsersRecord = AirtableRecord & {
   fields: {
     Email: string;
     PasswordHash: string;
-    CreatedAt?: string;
   };
 };
 
@@ -29,8 +28,7 @@ export class UsersAirtableClient extends AirtableHttpClient {
   async createUser(fields: { Email: string; PasswordHash: string }): Promise<UsersRecord> {
     const payload: AirtableFieldMap = {
       Email: fields.Email,
-      PasswordHash: fields.PasswordHash,
-      CreatedAt: new Date().toISOString(),
+      PasswordHash: fields.PasswordHash
     };
     const rec = await this.createRecord(payload);
     return rec as UsersRecord;

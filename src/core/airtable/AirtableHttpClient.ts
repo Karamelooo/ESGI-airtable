@@ -82,7 +82,19 @@ export class AirtableHttpClient implements AirtableClient {
     });
 
     if (!response.ok) {
-      throw new AirtableError('Airtable API request failed', response.status);
+      let detail = '';
+      try {
+        const t = await response.text();
+        if (t) {
+          try {
+            const j = JSON.parse(t) as { error?: { type?: string; message?: string } };
+            detail = j?.error?.message ? `: ${j.error.message}` : `: ${t}`;
+          } catch {
+            detail = `: ${t}`;
+          }
+        }
+      } catch {}
+      throw new AirtableError(`Airtable API request failed${detail}`, response.status);
     }
 
     const payload = (await response.json()) as AirtableRecord;
