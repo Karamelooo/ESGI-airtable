@@ -179,16 +179,7 @@ export default async function Home() {
       <><Navbar />
       <main className="flex min-h-screen flex-col items-center gap-8 bg-neutral-100 mt-18 px-6 py-12">
           <header className="max-w-7xl w-full text-center">
-            <h1 className="text-4xl font-bold text-neutral-900">
-              ESGI Portfolio
-            </h1>
-            <p className="mt-3 text-lg text-neutral-600 max-w-2xl mx-auto">
-              Interface Next.js combinant frontend et backend pour consulter une base Airtable.
-            </p>
-            {/* <div className="mt-6 flex justify-center gap-4 items-center">
-              <SessionBadge />
-            </div> */}
-            <SearchSection initialRecords={records} />
+            
           </header>
 
           <section className="w-full max-w-7xl">
