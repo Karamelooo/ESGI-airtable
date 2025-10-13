@@ -2,6 +2,7 @@ import { RecordEntity } from '@/domain/records/Record';
 import SearchSection from './components/SearchSection';
 import { createRecordsService } from '@/services/records/createRecordsService';
 import Navbar from './components/Navbar';
+import LikeButton from './components/LikeButton';
 
 const formatDate = (value: Date): string =>
   value.toLocaleString('fr-FR', {
@@ -14,15 +15,14 @@ const formatDate = (value: Date): string =>
 
 const ProjectCard = ({ record }: { record: RecordEntity }) => {
 
-  const getImageUrl = () => {
-    const imageField = record.fields.Image || record.fields.image;
-    
+  const getImageUrl = (): string => {
+    const imageField = (record.fields as any).Image || (record.fields as any).image;
     if (Array.isArray(imageField) && imageField.length > 0) {
-      // Utiliser la miniature 'large' si disponible, sinon l'URL complète
-      return imageField[0].thumbnails?.large?.url || imageField[0].url;
+      const first = imageField[0] as any;
+      const thumb = typeof first?.thumbnails?.large?.url === 'string' ? first.thumbnails.large.url : undefined;
+      const url = typeof first?.url === 'string' ? first.url : undefined;
+      return thumb || url || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=400&fit=crop";
     }
-    
-    // Image par défaut si aucune image n'est trouvée
     return "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=400&fit=crop";
   };
 
@@ -50,7 +50,6 @@ const ProjectCard = ({ record }: { record: RecordEntity }) => {
 
   return (
      <article className="group rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm transition-all hover:shadow-lg hover:border-neutral-300">
-      {/* Image du projet */}
       <div className="relative h-48 bg-gradient-to-br from-blue-500 to-blue-700 overflow-hidden">
         <img 
           src={getImageUrl()}
@@ -60,9 +59,7 @@ const ProjectCard = ({ record }: { record: RecordEntity }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
 
-      {/* Contenu de la card */}
       <div className="p-6">
-        {/* En-tête de la card */}
         <div className="mb-4">
           <h3 className="text-xl font-bold text-neutral-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
             {getTitle()}
@@ -72,14 +69,12 @@ const ProjectCard = ({ record }: { record: RecordEntity }) => {
           </span>
         </div>
 
-      {/* Description */}
       {getDescription() && (
         <p className="text-sm text-neutral-600 mb-4 line-clamp-3">
           {getDescription()}
         </p>
       )}
 
-      {/* Tags */}
       {getTags().length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {getTags().slice(0, 3).map((tag, idx) => (
@@ -93,8 +88,8 @@ const ProjectCard = ({ record }: { record: RecordEntity }) => {
         </div>
       )}
 
-      {/* Footer avec bouton */}
-      <div className="mt-auto pt-4 border-t border-neutral-100">
+      <div className="mt-auto pt-4 border-t border-neutral-100 flex items-center justify-between">
+        <LikeButton contentId={record.id} />
         <button className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1 group">
           Voir le projet
           <svg 
@@ -132,43 +127,7 @@ const ProjectsGrid = ({ records }: { records: RecordEntity[] }) => {
   );
 };
 
-// const RecordsList = ({ records }: { records: RecordEntity[] }) => {
-//   if (!records.length) {
-//     return (
-//       <p className="text-neutral-500">Aucun enregistrement trouvé dans Airtable pour le moment.</p>
-//     );
-//   }
-
-//   return (
-//     <div className="grid gap-4 w-full">
-//       {records.map((record) => (
-//         <article
-//           key={record.id}
-//           className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm"
-//         >
-//           <div className="flex items-center justify-between">
-//             <h2 className="text-lg font-semibold">{record.id}</h2>
-//             <span className="text-xs text-neutral-500">
-//               Créé le {formatDate(record.createdAt)}
-//             </span>
-//           </div>
-//           <dl className="mt-4 grid gap-2 text-sm text-neutral-700">
-//             {Object.entries(record.fields).map(([fieldName, fieldValue]) => (
-//               <div key={fieldName} className="grid grid-cols-[150px_1fr] gap-4">
-//                 <dt className="font-medium text-neutral-500">{fieldName}</dt>
-//                 <dd>
-//                   {Array.isArray(fieldValue)
-//                     ? fieldValue.join(', ')
-//                     : fieldValue ?? '—'}
-//                 </dd>
-//               </div>
-//             ))}
-//           </dl>
-//         </article>
-//       ))}
-//     </div>
-//   );
-// };
+ 
 
 export default async function Home() {
   try {
