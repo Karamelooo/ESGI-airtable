@@ -1,0 +1,23 @@
+.heart {
+  transform-origin: center;
+}
+
+.pop {
+  animation: pop 280ms ease-out;
+}
+
+.pulse {
+  animation: pulse 600ms ease-in-out;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(244, 63, 94, 0)); }
+  30% { transform: scale(1.08); filter: drop-shadow(0 0 4px rgba(244, 63, 94, 0.35)); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(244, 63, 94, 0)); }
+}
