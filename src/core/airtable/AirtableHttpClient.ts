@@ -69,4 +69,28 @@ export class AirtableHttpClient implements AirtableClient {
     const payload = (await response.json()) as AirtableListResponse;
     return payload;
   }
+
+  async createRecord(fields: AirtableFieldMap): Promise<AirtableRecord> {
+    const response = await fetch(this.baseUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.config.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fields }),
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      throw new AirtableError('Airtable API request failed', response.status);
+    }
+
+    const payload = (await response.json()) as AirtableRecord;
+    return payload;
+  }
+
+  async listRecordsRaw(params?: ListRecordsParams): Promise<AirtableRecord[]> {
+    const { records } = await this.listRecords(params);
+    return records;
+  }
 }

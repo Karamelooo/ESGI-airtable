@@ -1,5 +1,6 @@
 import { RecordEntity } from '@/domain/records/Record';
 import { createRecordsService } from '@/services/records/createRecordsService';
+import SessionBadge from './components/SessionBadge';
 
 const formatDate = (value: Date): string =>
   value.toLocaleString('fr-FR', {
@@ -62,6 +63,9 @@ export default async function Home() {
           <p className="mt-2 text-neutral-600">
             Interface Next.js combinant frontend et backend pour consulter une base Airtable.
           </p>
+          <div className="mt-4 flex justify-center text-black">
+            <SessionBadge />
+          </div>
         </header>
         <section className="w-full max-w-3xl">
           <RecordsList records={records} />
