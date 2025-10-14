@@ -1,8 +1,8 @@
 import { RecordEntity } from '@/domain/records/Record';
-import SearchSection from './components/SearchSection';
 import { createRecordsService } from '@/services/records/createRecordsService';
 import Navbar from './components/Navbar';
 import LikeButton from './components/LikeButton';
+import Image from 'next/image';
 
 const formatDate = (value: Date): string =>
   value.toLocaleString('fr-FR', {
@@ -51,10 +51,12 @@ const ProjectCard = ({ record }: { record: RecordEntity }) => {
   return (
      <article className="group rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm transition-all hover:shadow-lg hover:border-neutral-300">
       <div className="relative h-48 bg-gradient-to-br from-blue-500 to-blue-700 overflow-hidden">
-        <img 
+        <Image
           src={getImageUrl()}
           alt={getTitle()}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          fill
+          sizes="(max-width: 1024px) 100vw, 25vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>

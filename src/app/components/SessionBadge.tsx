@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 type User = { id: string; email: string } | null;
@@ -32,8 +33,8 @@ export default function SessionBadge() {
   if (!user) {
     return (
       <div className="flex items-center gap-4">
-        <a className="text-sm underline" href="/auth/login">Se connecter</a>
-        <a className="text-sm underline" href="/auth/signup">Créer un compte</a>
+        <Link className="text-sm underline" href="/auth/login">Se connecter</Link>
+        <Link className="text-sm underline" href="/auth/signup">Créer un compte</Link>
       </div>
     );
   }
@@ -41,7 +42,7 @@ export default function SessionBadge() {
   return (
     <div className="flex items-center gap-3">
       <span className="text-sm text-neutral-600">Connecté&nbsp;: {user.email}</span>
-      <button onClick={logout} className="text-sm underline">Se déconnecter</button>
+      <button type="button" onClick={logout} className="text-sm underline">Se déconnecter</button>
     </div>
   );
 }

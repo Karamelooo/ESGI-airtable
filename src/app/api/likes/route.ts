@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { AuthService } from '@/services/auth/AuthService';
 import { LikesService } from '@/services/likes/LikesService';
+import { Req } from '../auth/me/route';
 
 const toggleLikeSchema = z.object({
   contentId: z.string(),
@@ -11,9 +12,9 @@ const getLikeStatusSchema = z.object({
   contentId: z.string(),
 });
 
-export async function POST(req: Request) {
+export async function POST(req: Req) {
   try {
-    const cookie = (await (req as any).cookies?.get?.('session'))?.value;
+    const cookie = (await req.cookies?.get?.('session'))?.value;
     if (!cookie) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
+export async function GET(req: Req) {
   try {
     const { searchParams } = new URL(req.url);
     const contentId = searchParams.get('contentId');
@@ -43,7 +44,7 @@ export async function GET(req: Request) {
     if (!contentId) {
       return NextResponse.json({ error: 'contentId requis' }, { status: 400 });
     }
-    const cookie = (await (req as any).cookies?.get?.('session'))?.value;
+    const cookie = (await req.cookies?.get?.('session'))?.value;
     if (!cookie) {
       const likesService = new LikesService();
       const count = await likesService.getLikesCount(contentId);

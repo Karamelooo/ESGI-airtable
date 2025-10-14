@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import { AuthService } from '@/services/auth/AuthService';
 
-export async function GET(req: Request) {
+export type Req = Request & {
+  cookies?: {
+    get?: (name: string) => { value: string } | undefined;
+  };
+};
+
+export async function GET(req: Req) {
   try {
-    const cookie = (await (req as any).cookies?.get?.('session'))?.value;
+    const cookie = (await req.cookies?.get?.('session'))?.value;
 
     if (!cookie) return NextResponse.json({ user: null }, { status: 200 });
 
