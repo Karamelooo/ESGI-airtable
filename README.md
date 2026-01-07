@@ -1,12 +1,12 @@
 # ESGI Airtable App
 
-Application Next.js full-stack respectant les principes SOLID. Elle propose une interface de consultation en lecture d'une base Airtable ainsi qu'un backend d'API REST pour récupérer les enregistrements.
+Application Next.js full-stack respectant les principes SOLID. Elle propose une interface de portfolio permettant de consulter des projets depuis une base Airtable, de créer un compte utilisateur, de s'authentifier et de gérer son profil.
 
 ## Prérequis
 
 - Node.js 20.0.0 ou supérieur (recommandé : 20 LTS)
 - npm 10 ou supérieur
-- Un compte Airtable avec un accès en lecture à la base cible
+- Un compte Airtable avec un accès en lecture/écriture à la base cible
 
 ## Installation
 
@@ -16,27 +16,27 @@ npm install
 
 ## Configuration de l'environnement
 
-1. Dupliquez le fichier `.env` (ou `.env.example`) en `.env.local`.
+1. Dupliquez le fichier `.env.example` en `.env.local`.
 2. Renseignez les valeurs récupérées depuis Airtable :
 
-```bash
-AIRTABLE_API_KEY=sk_************************
-AIRTABLE_BASE_ID=app****************
-AIRTABLE_TABLE_ID=NomOuIdDeLaTable
+```ini
+AIRTABLE_API_KEY=TOKEN_SECRET_API_KEY
+AIRTABLE_BASE_ID=TOKEN_SECRET_BASE_ID
+AIRTABLE_TABLE_ID=TOKEN_SECRET_TABLE_ID
+AIRTABLE_USERS_TABLE_ID=TOKEN_SECRET_USERS_TABLE_ID
+AIRTABLE_LIKES_TABLE_ID=TOKEN_SECRET_LIKES_TABLE_ID
+
+JWT_SECRET=TOKEN_SECRET
 ```
 
-- `AIRTABLE_API_KEY` : token personnel Airtable disposant des permissions `data.records:read`.
-- `AIRTABLE_BASE_ID` : identifiant de la base (visible dans l'URL partageable ou via l'API Airtable).
-- `AIRTABLE_TABLE_ID` : nom de la table ou ID encodé URL (par exemple `Table%201` si votre table s'appelle « Table 1 »).
+### Variables d'environnement
 
-> ⚠️ Ne commitez jamais vos valeurs réelles dans le dépôt. Conservez uniquement des exemples ou des tokens de développement.
-
-### Accès en lecture à la base Airtable
-
-1. Dans Airtable, rendez-vous dans *Developer Hub* puis créez un **Personal access token** avec le scope `data.records:read` et limitez-le à la base concernée.
-2. Récupérez l'identifiant de la base depuis l'URL de partage (`https://airtable.com/appXXXXXXXXXXXXXX/tblYYYYYYYYYYYYY/...`).
-3. Facultatif : créez une vue filtrée dédiée à l'application pour mieux contrôler les données exposées.
-4. Complétez le fichier `.env.local` avec ces informations puis redémarrez le serveur de développement.
+- `AIRTABLE_API_KEY` : Token personnel Airtable disposant des permissions `data.records:read` et `data.records:write`.
+- `AIRTABLE_BASE_ID` : Identifiant de la base.
+- `AIRTABLE_TABLE_ID` : Nom ou ID de la table contenant les **projets** (Portfolio).
+- `AIRTABLE_USERS_TABLE_ID` : Nom ou ID de la table contenant les **utilisateurs**.
+- `AIRTABLE_LIKES_TABLE_ID` : Nom ou ID de la table contenant les **likes**.
+- `JWT_SECRET` : Une chaîne aléatoire utilisée pour signer les tokens d'authentification.
 
 ## Lancer le projet
 
@@ -44,9 +44,11 @@ AIRTABLE_TABLE_ID=NomOuIdDeLaTable
 npm run dev
 ```
 
-Le serveur Next.js (frontend + backend) démarre sur `http://localhost:3000` :
-- Interface web de consultation : `/`
-- API REST interne : `GET /api/records`
+Le serveur Next.js démarre sur `http://localhost:3000` :
+
+- **Page d'accueil / Recherche** : `/` (avec filtre par tag et tri).
+- **Authentification** : `/auth/login` et `/auth/signup`.
+- **Profil Utilisateur** : `/profile`.
 
 Pour exécuter la version de production :
 
@@ -55,30 +57,38 @@ npm run build
 npm run start
 ```
 
-## Vérifier la connexion Airtable
+## Fonctionnalités
 
-Vous pouvez valider la configuration en interrogeant l'API interne :
+### Portfolio & Recherche
+- Liste des projets depuis Airtable.
+- Recherche par nom ou tag.
+- Filtrage par tag.
+- **Tri** : Les résultats peuvent être triés par nom (croissant/décroissant).
 
-```bash
-curl http://localhost:3000/api/records
-```
+### Authentification & Utilisateurs
+- Inscription (Email, Mot de passe sécurisé).
+- Connexion (JWT en cookie `httpOnly`).
+- Gestion de profil : modification des informations personnelles (Nom, Bio, Localisation...) stockées dans Airtable.
+- Suppression de compte.
 
 ## Architecture & principes SOLID
 
-- **Single Responsibility** : chaque couche (configuration, client HTTP Airtable, dépôt, service, route) assume une responsabilité unique.
-- **Open/Closed** : les implémentations (ex. `AirtableRecordsRepository`) peuvent être étendues sans modifier les interfaces de domaine.
-- **Liskov Substitution** : le service consomme l'interface `RecordsRepository`, garantissant l'interchangeabilité.
-- **Interface Segregation** : seules les méthodes nécessaires (`list`) sont exposées par le dépôt.
-- **Dependency Inversion** : la composition des dépendances se fait via `createRecordsService`, qui fournit au domaine des interfaces plutôt que des implémentations concrètes.
+Le projet applique une architecture modulaire stricte :
+
+- **Core** : Clients HTTP génériques (`AirtableHttpClient`).
+- **Services** : Logique métier (`AuthService`, `SearchPortfolioService`).
+- **API Routes** : Points d'entrée backend (`/api/auth/*`, `/api/search/*`).
+- **Components** : Composants React réutilisables (`SearchBar`, `Navbar`).
 
 ## Technologies utilisées
 
-- Next.js 15 (App Router) – frontend & backend unifiés
-- React 19
-- TypeScript
-- Airtable REST API
-- ESLint 9
-- Tailwind CSS 4 (préconfiguré pour le stylage)
+- **Framework** : Next.js 15 (App Router)
+- **Langage** : TypeScript
+- **UI** : React 19, Tailwind CSS 4
+- **Base de données** : Airtable (via API REST)
+- **Validation** : Zod
+- **Sécurité** : BCryptJS (hachage mots de passe), JWT
+- **Linter** : ESLint 9
 
 ## Membres du groupe
 
@@ -86,9 +96,3 @@ curl http://localhost:3000/api/records
 - Poumailloux Léo : *Développeur*
 - Serenne Arthur : *Développeur*
 - Yildiz Erkant : *Développeur*
-
-## Informations utiles supplémentaires
-
-- Les requêtes Airtable sont effectuées côté serveur pour éviter toute exposition de l'API key.
-- Les réponses API sont sans cache (`cache: 'no-store'`) pour toujours refléter l'état actuel de la base.
-- Pour changer de table ou de vue, adaptez simplement les variables d'environnement sans modifier le code.

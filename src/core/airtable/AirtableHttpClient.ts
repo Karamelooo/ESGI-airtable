@@ -17,6 +17,7 @@ export type ListRecordsParams = {
   maxRecords?: number;
   view?: string;
   filterByFormula?: string;
+  [key: string]: any;
 };
 
 export interface AirtableClient {
@@ -44,16 +45,13 @@ export class AirtableHttpClient implements AirtableClient {
   async listRecords(params?: ListRecordsParams): Promise<AirtableListResponse> {
     const url = new URL(this.baseUrl);
 
-    if (params?.maxRecords) {
-      url.searchParams.set('maxRecords', params.maxRecords.toString());
-    }
-
-    if (params?.view) {
-      url.searchParams.set('view', params.view);
-    }
-
-    if (params?.filterByFormula) {
-      url.searchParams.set('filterByFormula', params.filterByFormula);
+    if (params) {
+      Object.keys(params).forEach(key => {
+        const value = params[key];
+        if (value !== undefined && value !== null) {
+          url.searchParams.append(key, String(value));
+        }
+      });
     }
 
     const response = await fetch(url, {
@@ -94,7 +92,7 @@ export class AirtableHttpClient implements AirtableClient {
             detail = `: ${t}`;
           }
         }
-      } catch {}
+      } catch { }
       throw new AirtableError(`Airtable API request failed${detail}`, response.status);
     }
 
@@ -125,7 +123,7 @@ export class AirtableHttpClient implements AirtableClient {
             detail = `: ${t}`;
           }
         }
-      } catch {}
+      } catch { }
       throw new AirtableError(`Airtable API request failed${detail}`, response.status);
     }
 
