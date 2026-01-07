@@ -4,13 +4,14 @@ import { RecordEntity } from '@/domain/records/Record';
 import { useSearch } from '@/store/SearchContext';
 import LikeButton from './LikeButton';
 
-const formatDate = (value: Date): string =>
-  value.toLocaleString('fr-FR', {
+const formatDate = (value: Date | string): string =>
+  new Date(value).toLocaleString('fr-FR', {
     year: 'numeric',
     month: 'short',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Europe/Paris',
   });
 
 const ProjectCard = ({ record }: { record: RecordEntity }) => {
@@ -26,11 +27,11 @@ const ProjectCard = ({ record }: { record: RecordEntity }) => {
   };
 
   const getTitle = () => {
-    return record.fields.Nom || 
-           record.fields.nom || 
-           record.fields.Name ||
-           record.fields.name || 
-           'Projet sans titre';
+    return record.fields.Nom ||
+      record.fields.nom ||
+      record.fields.Name ||
+      record.fields.name ||
+      'Projet sans titre';
   };
 
   const getDescription = () => {
@@ -47,7 +48,7 @@ const ProjectCard = ({ record }: { record: RecordEntity }) => {
   return (
     <article className="group rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm transition-all hover:shadow-lg hover:border-neutral-300">
       <a href={`/projects/${record.id}`} className="block relative h-48 bg-gradient-to-br from-blue-500 to-blue-700 overflow-hidden">
-        <img 
+        <img
           src={getImageUrl()}
           alt={getTitle() as string}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -76,7 +77,7 @@ const ProjectCard = ({ record }: { record: RecordEntity }) => {
         {getTags().length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
             {getTags().slice(0, 3).map((tag, idx) => (
-              <span 
+              <span
                 key={idx}
                 className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
               >
@@ -88,15 +89,15 @@ const ProjectCard = ({ record }: { record: RecordEntity }) => {
 
         <div className="mt-auto pt-4 border-t border-neutral-100 flex items-center justify-between">
           <LikeButton contentId={record.id} />
-          <a 
+          <a
             href={`/projects/${record.id}`}
             className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1 group"
           >
             Voir le projet
-            <svg 
-              className="w-4 h-4 transition-transform group-hover:translate-x-1" 
-              fill="none" 
-              viewBox="0 0 24 24" 
+            <svg
+              className="w-4 h-4 transition-transform group-hover:translate-x-1"
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
