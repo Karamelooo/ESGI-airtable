@@ -1,7 +1,133 @@
+import { RecordEntity } from '@/domain/records/Record';
+import SearchSection from './components/SearchSection';
 import { createRecordsService } from '@/services/records/createRecordsService';
-import { Header } from '@/components/layout/Header';
-import { RecordsList } from '@/components/records/RecordsList';
-import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import Navbar from './components/Navbar';
+import LikeButton from './components/LikeButton';
+
+const formatDate = (value: Date): string =>
+  value.toLocaleString('fr-FR', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+const ProjectCard = ({ record }: { record: RecordEntity }) => {
+
+  const getImageUrl = (): string => {
+    const imageField = (record.fields as any).Image || (record.fields as any).image;
+    if (Array.isArray(imageField) && imageField.length > 0) {
+      const first = imageField[0] as any;
+      const thumb = typeof first?.thumbnails?.large?.url === 'string' ? first.thumbnails.large.url : undefined;
+      const url = typeof first?.url === 'string' ? first.url : undefined;
+      return thumb || url || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=400&fit=crop";
+    }
+    return "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=400&fit=crop";
+  };
+
+  // Extraire le titre (votre champ s'appelle "Nom")
+  const getTitle = () => {
+    return record.fields.Nom ||
+      record.fields.nom ||
+      record.fields.Name ||
+      record.fields.name ||
+      'Projet sans titre';
+  };
+
+  // Extraire la description
+  const getDescription = () => {
+    return record.fields.Description || record.fields.description || '';
+  };
+
+  // Extraire les tags
+  const getTags = () => {
+    const tags = record.fields.Tags || record.fields.tags;
+    if (Array.isArray(tags)) return tags;
+    if (typeof tags === 'string') return tags.split(',').map(t => t.trim());
+    return [];
+  };
+
+  return (
+    <article className="group rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm transition-all hover:shadow-lg hover:border-neutral-300">
+      <div className="relative h-48 bg-gradient-to-br from-blue-500 to-blue-700 overflow-hidden">
+        <img
+          src={getImageUrl()}
+          alt={getTitle()}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
+
+      <div className="p-6">
+        <div className="mb-4">
+          <h3 className="text-xl font-bold text-neutral-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+            {getTitle()}
+          </h3>
+          <span className="text-xs text-neutral-500 uppercase tracking-wide">
+            {formatDate(record.createdAt)}
+          </span>
+        </div>
+
+        {getDescription() && (
+          <p className="text-sm text-neutral-600 mb-4 line-clamp-3">
+            {getDescription()}
+          </p>
+        )}
+
+        {getTags().length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {getTags().slice(0, 3).map((tag, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-auto pt-4 border-t border-neutral-100 flex items-center justify-between">
+          <LikeButton contentId={record.id} />
+          <button className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1 group">
+            Voir le projet
+            <svg
+              className="w-4 h-4 transition-transform group-hover:translate-x-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+const ProjectsGrid = ({ records }: { records: RecordEntity[] }) => {
+  if (!records.length) {
+    return (
+      <div className="col-span-full text-center py-12">
+        <p className="text-neutral-500 text-lg">
+          Aucun projet trouvé dans Airtable pour le moment.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+      {records.map((record) => (
+        <ProjectCard key={record.id} record={record} />
+      ))}
+    </div>
+  );
+};
+
+
 
 export default async function Home() {
   try {
@@ -9,15 +135,25 @@ export default async function Home() {
     const records = await recordsService.listRecords();
 
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="max-w-4xl mx-auto">
-            <RecordsList records={records} />
-          </div>
+      <><Navbar />
+        <main className="flex min-h-screen flex-col items-center gap-8 bg-neutral-100 mt-18 px-6 py-12">
+          <header className="max-w-7xl w-full text-center">
+
+          </header>
+
+          <section className="w-full max-w-7xl">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-neutral-900">
+                Mes Projets
+              </h2>
+              <p className="text-neutral-600 mt-1">
+                {records.length} projet{records.length > 1 ? 's' : ''} disponible{records.length > 1 ? 's' : ''}
+              </p>
+            </div>
+            <ProjectsGrid records={records} />
+          </section>
         </main>
-      </div>
+      </>
     );
   } catch (error) {
     const message =
@@ -30,9 +166,9 @@ export default async function Home() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-        
+
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ErrorDisplay 
+          <ErrorDisplay
             message={message}
             details={details}
           />
