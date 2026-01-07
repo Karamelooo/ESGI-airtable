@@ -39,12 +39,12 @@ export default async function ProjectDetailPage({
 
   try {
     const project = await recordsService.getRecordById(id);
-    
+
     const fields = project.fields as any;
     const title = fields.Nom || fields.nom || fields.Name || fields.name || 'Projet sans titre';
     const description = fields.Description || fields.description || '';
-    const tags = Array.isArray(fields.Tags || fields.tags) 
-      ? (fields.Tags || fields.tags) 
+    const tags = Array.isArray(fields.Tags || fields.tags)
+      ? (fields.Tags || fields.tags)
       : (typeof (fields.Tags || fields.tags) === 'string' ? (fields.Tags || fields.tags).split(',').map((t: string) => t.trim()) : []);
 
     const imageUrl = (() => {
@@ -60,8 +60,8 @@ export default async function ProjectDetailPage({
         <Navbar />
         <main className="min-h-screen bg-neutral-100 mt-16 px-6 py-12">
           <div className="max-w-4xl mx-auto">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="inline-flex items-center text-sm text-neutral-600 hover:text-neutral-900 mb-8 transition-colors"
             >
               <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -72,8 +72,8 @@ export default async function ProjectDetailPage({
 
             <article className="bg-white rounded-2xl border border-neutral-200 shadow-xl overflow-hidden text-black">
               <div className="relative h-[400px]">
-                <img 
-                  src={imageUrl} 
+                <img
+                  src={imageUrl}
                   alt={title}
                   className="w-full h-full object-cover"
                 />

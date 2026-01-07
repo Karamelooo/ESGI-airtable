@@ -131,7 +131,7 @@ export default function ProfilePage() {
                   {profile?.Email?.[0].toUpperCase()}
                 </div>
                 <h2 className="text-xl font-bold truncate">{profile?.Email}</h2>
-                <p className="text-neutral-500 text-sm mt-1">Étudiant ESGI</p>
+                <p className="text-neutral-500 text-sm mt-1">Candidat ESGI</p>
               </div>
             </div>
 
