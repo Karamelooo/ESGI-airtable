@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './LikeButton.module.css';
 
 interface LikeButtonProps {
@@ -13,6 +14,7 @@ export default function LikeButton({ contentId, className = '' }: LikeButtonProp
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [anim, setAnim] = useState<'none' | 'pop' | 'pulse'>('none');
+  const router = useRouter();
 
   useEffect(() => {
     const loadLikeStatus = async () => {
@@ -40,6 +42,7 @@ export default function LikeButton({ contentId, className = '' }: LikeButtonProp
 
     const prevLiked = liked;
     const prevCount = count;
+    
     setLiked(!prevLiked);
     setCount(prevLiked ? prevCount - 1 : prevCount + 1);
     setAnim(prevLiked ? 'pop' : 'pulse');
@@ -55,6 +58,13 @@ export default function LikeButton({ contentId, className = '' }: LikeButtonProp
       });
 
       const data = await res.json();
+
+      if (res.status === 401) {
+        router.push('/auth/login');
+        setLiked(prevLiked);
+        setCount(prevCount);
+        return;
+      }
 
       if (!res.ok) {
         throw new Error(data.error || 'Erreur');

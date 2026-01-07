@@ -21,6 +21,7 @@ export type ListRecordsParams = {
 
 export interface AirtableClient {
   listRecords: (params?: ListRecordsParams) => Promise<AirtableListResponse>;
+  getRecord: (recordId: string) => Promise<AirtableRecord>;
 }
 
 export class AirtableError extends Error {
@@ -135,5 +136,21 @@ export class AirtableHttpClient implements AirtableClient {
   async listRecordsRaw(params?: ListRecordsParams): Promise<AirtableRecord[]> {
     const { records } = await this.listRecords(params);
     return records;
+  }
+
+  async getRecord(recordId: string): Promise<AirtableRecord> {
+    const response = await fetch(`${this.baseUrl}/${recordId}`, {
+      headers: {
+        Authorization: `Bearer ${this.config.apiKey}`,
+      },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      throw new AirtableError('Airtable API request failed', response.status);
+    }
+
+    const payload = (await response.json()) as AirtableRecord;
+    return payload;
   }
 }

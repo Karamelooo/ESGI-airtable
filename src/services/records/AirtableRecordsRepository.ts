@@ -25,4 +25,9 @@ export class AirtableRecordsRepository implements RecordsRepository {
     const { records } = await this.client.listRecords();
     return records.map(toRecordEntity);
   }
+
+  async getById(id: string): Promise<RecordEntity> {
+    const record = await this.client.getRecord(id);
+    return toRecordEntity(record);
+  }
 }

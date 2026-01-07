@@ -9,8 +9,17 @@ export async function GET(req: Request) {
 
     const auth = new AuthService();
     const payload = auth.verify(cookie);
-    return NextResponse.json({ user: { id: payload.sub, email: payload.email } });
-  } catch {
+    
+    const user = await auth.getUser(payload.sub);
+    
+    return NextResponse.json({ 
+      user: { 
+        id: user.id, 
+        email: user.fields.Email,
+        ...user.fields
+      } 
+    });
+  } catch (error) {
     return NextResponse.json({ user: null }, { status: 200 });
   }
 }

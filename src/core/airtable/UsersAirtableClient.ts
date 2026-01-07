@@ -5,6 +5,13 @@ export type UsersRecord = AirtableRecord & {
   fields: {
     Email: string;
     PasswordHash: string;
+    FirstName?: string;
+    LastName?: string;
+    Phone?: string;
+    Location?: string;
+    Bio?: string;
+    Position?: string;
+    School?: string;
   };
 };
 
@@ -25,6 +32,15 @@ export class UsersAirtableClient extends AirtableHttpClient {
     return records[0] as UsersRecord;
   }
 
+  async findById(id: string): Promise<UsersRecord | null> {
+    try {
+      const rec = await this.getRecord(id);
+      return rec as UsersRecord;
+    } catch {
+      return null;
+    }
+  }
+
   async createUser(fields: { Email: string; PasswordHash: string }): Promise<UsersRecord> {
     const payload: AirtableFieldMap = {
       Email: fields.Email,
@@ -32,5 +48,24 @@ export class UsersAirtableClient extends AirtableHttpClient {
     };
     const rec = await this.createRecord(payload);
     return rec as UsersRecord;
+  }
+
+  async updateUser(id: string, fields: Partial<UsersRecord['fields']>): Promise<UsersRecord> {
+    const { id: _, ID: __, CreatedAt: ___, CreatedTime: ____, ...cleanFields } = fields as any;
+    const rec = await this.updateRecord(id, cleanFields as AirtableFieldMap);
+    return rec as UsersRecord;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    const response = await fetch(`${(this as any).baseUrl}/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${(this as any).config.apiKey}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete user: ${response.statusText}`);
+    }
   }
 }

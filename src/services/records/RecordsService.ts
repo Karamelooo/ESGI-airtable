@@ -7,4 +7,8 @@ export class RecordsService {
   async listRecords(): Promise<RecordEntity[]> {
     return this.repository.list();
   }
+
+  async getRecordById(id: string): Promise<RecordEntity> {
+    return this.repository.getById(id);
+  }
 }
