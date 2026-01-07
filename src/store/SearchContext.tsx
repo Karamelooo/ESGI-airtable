@@ -6,15 +6,17 @@ type SortBy = '' | 'asc' | 'desc';
 
 type SearchContextState = {
   records: RecordEntity[] | null;
-  setRecords: (r: RecordEntity[] | null) => void;
+  setRecords: React.Dispatch<React.SetStateAction<RecordEntity[] | null>>;
   search: string;
-  setSearch: (s: string) => void;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+  selectedTag: string | null;
+  setSelectedTag: React.Dispatch<React.SetStateAction<string | null>>;
   sortby: SortBy;
-  setSortby: (s: SortBy) => void;
+  setSortby: React.Dispatch<React.SetStateAction<SortBy>>;
   loading: boolean;
-  setLoading: (b: boolean) => void;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   error: string | null;
-  setError: (e: string | null) => void;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 const SearchContext = createContext<SearchContextState | undefined>(undefined);
@@ -22,13 +24,14 @@ const SearchContext = createContext<SearchContextState | undefined>(undefined);
 export function SearchProvider({ children }: { children: React.ReactNode }) {
   const [records, setRecords] = useState<RecordEntity[] | null>(null);
   const [search, setSearch] = useState('');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [sortby, setSortby] = useState<SortBy>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const value = useMemo(
-    () => ({ records, setRecords, search, setSearch, sortby, setSortby, loading, setLoading, error, setError }),
-    [records, search, sortby, loading, error],
+    () => ({ records, setRecords, search, setSearch, selectedTag, setSelectedTag, sortby, setSortby, loading, setLoading, error, setError }),
+    [records, search, selectedTag, sortby, loading, error],
   );
 
   return <SearchContext.Provider value={value}>{children}</SearchContext.Provider>;
@@ -39,4 +42,3 @@ export function useSearch() {
   if (!ctx) throw new Error('useSearch must be used within SearchProvider');
   return ctx;
 }
-

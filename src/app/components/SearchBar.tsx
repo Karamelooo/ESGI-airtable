@@ -7,6 +7,8 @@ export default function SearchBar() {
   const {
     search,
     setSearch,
+    selectedTag,
+    setSelectedTag,
     sortby,
     setSortby,
     setRecords,
@@ -21,7 +23,7 @@ export default function SearchBar() {
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
-      if (!debouncedSearch && !sortby) {
+      if (!debouncedSearch && !sortby && !selectedTag) {
         setRecords(null);
         setError(null);
         return;
@@ -32,6 +34,8 @@ export default function SearchBar() {
         const params = new URLSearchParams();
         if (debouncedSearch) params.set('search', debouncedSearch);
         if (sortby) params.set('sortby', sortby);
+        if (selectedTag) params.set('tag', selectedTag);
+        
         const res = await fetch(`/api/search/portfolio?${params.toString()}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -57,7 +61,7 @@ export default function SearchBar() {
     return () => {
       cancelled = true;
     };
-  }, [debouncedSearch, sortby, setError, setLoading, setRecords]);
+  }, [debouncedSearch, sortby, selectedTag, setError, setLoading, setRecords]);
 
   const toggleSort = () => {
     setSortby((prev) => (prev === '' ? 'asc' : prev === 'asc' ? 'desc' : ''));

@@ -16,15 +16,13 @@ const formatDate = (value: Date): string =>
 export default async function Home() {
   try {
     const recordsService = createRecordsService();
-    const records = await recordsService.listRecords();
+    const initialRecords = await recordsService.listRecords();
+    const allTags = await recordsService.getAllTags();
 
     return (
-      <><Navbar />
-      <main className="flex min-h-screen flex-col items-center gap-8 bg-neutral-100 mt-18 px-6 py-12">
-          <header className="max-w-7xl w-full text-center">
-            
-          </header>
-
+      <>
+        <Navbar />
+        <main className="min-h-screen bg-neutral-100 mt-16 px-6 py-12 flex flex-col items-center">
           <section className="w-full max-w-7xl flex flex-col items-center">
             <div className="mb-6 w-full text-center">
               <h2 className="text-3xl font-bold text-neutral-900">
@@ -34,8 +32,7 @@ export default async function Home() {
                 Explorez les réalisations des étudiants de la filière Ingénierie du Web.
               </p>
             </div>
-            
-            <SearchSection initialRecords={records} />
+            <SearchSection initialRecords={initialRecords} allTags={allTags} />
           </section>
         </main>
       </>

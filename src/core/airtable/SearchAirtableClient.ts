@@ -3,6 +3,7 @@ import { AirtableHttpClient } from "./AirtableHttpClient";
 
 export type SearchParams = {
   search?: string;
+  tag?: string;
   sortby?: '' | 'asc' | 'desc';
 };
 
@@ -17,12 +18,31 @@ export class SearchAirtableClient extends AirtableHttpClient {
   }
 
   async searchRecords(params: SearchParams) {
-    const { search, sortby } = params;
+    const { search, tag, sortby } = params;
     const queryParams = new URLSearchParams();
     
+    let formula = '';
+    const conditions: string[] = [];
+
     if (search) {
-      queryParams.set('filterByFormula', `SEARCH(LOWER("${search.replace(/"/g, '\\"')}"), LOWER({Nom}))`);
+      const escaped = search.replace(/"/g, '\\"');
+      conditions.push(`OR(SEARCH(LOWER("${escaped}"), LOWER({Nom})), SEARCH(LOWER("${escaped}"), LOWER({Tags})))`);
     }
+
+    if (tag) {
+      conditions.push(`SEARCH(LOWER("${tag.replace(/"/g, '\\"')}"), LOWER({Tags}))`);
+    }
+
+    if (conditions.length > 1) {
+      formula = `AND(${conditions.join(', ')})`;
+    } else if (conditions.length === 1) {
+      formula = conditions[0];
+    }
+
+    if (formula) {
+      queryParams.set('filterByFormula', formula);
+    }
+
     if (sortby) {
       queryParams.set('sort[0][field]', 'Nom');
       queryParams.set('sort[0][direction]', sortby);

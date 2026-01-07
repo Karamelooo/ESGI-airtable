@@ -8,12 +8,12 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   const searchTerm = searchParams.get('search') || '';
+  const tag = searchParams.get('tag') || '';
   const sortby = searchParams.get('sortby') as '' | 'asc' | 'desc' || '';
 
   try {
     const recordsService = new SearchPortfolioService();
-    const records = await recordsService.searchRecords({ search: searchTerm, sortby });
-
+    const records = await recordsService.searchRecords({ search: searchTerm, tag, sortby });
     return NextResponse.json({ records });
   } catch (error) {
     if (error instanceof AirtableError) {

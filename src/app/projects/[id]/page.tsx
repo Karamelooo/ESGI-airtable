@@ -2,22 +2,39 @@ import { createRecordsService } from '@/services/records/createRecordsService';
 import Navbar from '@/app/components/Navbar';
 import LikeButton from '@/app/components/LikeButton';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
+import { AuthService } from '@/services/auth/AuthService';
 
-const formatDate = (value: Date): string =>
-  value.toLocaleString('fr-FR', {
+const formatDate = (value: Date | string): string =>
+  new Date(value).toLocaleString('fr-FR', {
     year: 'numeric',
     month: 'long',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Europe/Paris',
   });
 
 export default async function ProjectDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = params;
+  const { id } = await params;
+  
+  const cookieStore = await cookies();
+  const token = cookieStore.get('session')?.value;
+  let isLoggedIn = false;
+  if (token) {
+    try {
+      const auth = new AuthService();
+      auth.verify(token);
+      isLoggedIn = true;
+    } catch {
+      isLoggedIn = false;
+    }
+  }
+
   const recordsService = createRecordsService();
 
   try {
@@ -91,28 +108,31 @@ export default async function ProjectDetailPage({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className={`grid grid-cols-1 ${isLoggedIn ? '' : 'md:grid-cols-2'} gap-8`}>
                   <div>
                     <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-4">Spécifications</h3>
                     <ul className="space-y-3">
                       {Object.entries(fields).map(([key, value]) => {
-                        if (['Nom', 'nom', 'Name', 'name', 'Description', 'description', 'Image', 'image', 'Tags', 'tags'].includes(key)) return null;
+                        if (['Nom', 'nom', 'Name', 'name', 'Description', 'description', 'Image', 'image', 'Likes', 'likes'].includes(key)) return null;
+                        const displayValue = Array.isArray(value) ? value.join(', ') : String(value);
                         return (
-                          <li key={key} className="flex justify-between text-sm py-2 border-b border-neutral-50">
-                            <span className="font-medium text-neutral-500">{key}</span>
-                            <span className="text-neutral-900">{String(value)}</span>
+                          <li key={key} className="flex justify-between items-start gap-4 text-sm py-2 border-b border-neutral-50">
+                            <span className="font-medium text-neutral-500 shrink-0">{key}</span>
+                            <span className="text-neutral-900 text-right break-words">{displayValue}</span>
                           </li>
                         );
                       })}
                     </ul>
                   </div>
-                  <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                    <h3 className="text-blue-900 font-bold mb-2">Besoin de plus d'infos ?</h3>
-                    <p className="text-blue-700 text-sm mb-4">Inscrivez-vous pour être contacté par notre service admissions.</p>
-                    <Link href="/auth/signup" className="inline-block w-full py-3 bg-blue-600 text-white text-center rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
-                      Créer un compte
-                    </Link>
-                  </div>
+                  {!isLoggedIn && (
+                    <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100 h-fit">
+                      <h3 className="text-blue-900 font-bold mb-2">Besoin de plus d'infos ?</h3>
+                      <p className="text-blue-700 text-sm mb-4">Inscrivez-vous pour être contacté par notre service admissions.</p>
+                      <Link href="/auth/signup" className="inline-block w-full py-3 bg-blue-600 text-white text-center rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                        Créer un compte
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             </article>
