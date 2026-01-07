@@ -4,13 +4,19 @@ import { AuthService } from '@/services/auth/AuthService';
 
 const bodySchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
 });
 
 export async function POST(req: Request) {
   try {
     const json = await req.json();
-    const { email, password } = bodySchema.parse(json);
+    const parseResult = bodySchema.safeParse(json);
+
+    if (!parseResult.success) {
+      return NextResponse.json({ error: parseResult.error.issues[0].message }, { status: 400 });
+    }
+
+    const { email, password } = parseResult.data;
 
     const auth = new AuthService();
     const { token, user } = await auth.signup(email, password);

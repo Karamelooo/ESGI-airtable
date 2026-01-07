@@ -11,10 +11,11 @@ export async function PATCH(req: Request) {
     const userId = payload.sub;
 
     const data = await req.json();
-    
+
     const forbidden = [
       'id',
-      'Email', 
+      'Email',
+      'email',
       'PasswordHash',
       'CreatedAt',
     ];
@@ -46,7 +47,7 @@ export async function DELETE(req: Request) {
 
     const response = NextResponse.json({ success: true });
     response.cookies.delete('session');
-    
+
     return response;
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
