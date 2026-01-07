@@ -63,7 +63,7 @@ const ProjectCard = ({ record }: { record: RecordEntity }) => {
               {getTitle()}
             </h3>
           </a>
-          <span className="text-xs text-neutral-500 uppercase tracking-wide">
+          <span className="text-xs text-neutral-500 uppercase tracking-wide" suppressHydrationWarning>
             {formatDate(record.createdAt)}
           </span>
         </div>
